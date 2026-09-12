@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        G-08 | Model Dashboard
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+
+    <!-- ================================================= -->
+    <!-- HEADER -->
+    <!-- ================================================= -->
+
+    <div class="header">
+
+        <h1>
+            Model Performance Dashboard
+        </h1>
+
+        <p>
+            G-08 | Automated Customer Support Ticket Routing
+        </p>
+
+        <a
+            href="/"
+            class="dashboard-button"
+        >
+            ← Back to Ticket Prediction
+        </a>
+
+    </div>
+
+
+    {% if error %}
+
+        <div class="card">
+
+            <div class="error">
+                {{ error }}
+            </div>
+
+        </div>
+
+    {% else %}
+
+
+    <!-- ================================================= -->
+    <!-- SUMMARY -->
+    <!-- ================================================= -->
+
+    <div class="dashboard-grid">
+
+
+        <div class="stat-card">
+
+            <h3>
+                Test Tickets
+            </h3>
+
+            <div class="stat-value">
+                {{ test_size }}
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>
+                ML Accuracy
+            </h3>
+
+            <div class="stat-value">
+                {{ ml_metrics.accuracy }}%
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>
+                ML Macro F1
+            </h3>
+
+            <div class="stat-value">
+                {{ ml_metrics.f1 }}%
+            </div>
+
+        </div>
+
+
+        <div class="stat-card">
+
+            <h3>
+                Better Method
+            </h3>
+
+            <div class="stat-value small">
+                {{ better_model }}
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- ML VS BASELINE -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>
+            ML vs Heuristic Baseline
+        </h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        Metric
+                    </th>
+
+                    <th>
+                        Machine Learning
+                    </th>
+
+                    <th>
+                        Heuristic Baseline
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                <tr>
+
+                    <td>
+                        Accuracy
+                    </td>
+
+                    <td>
+                        {{ ml_metrics.accuracy }}%
+                    </td>
+
+                    <td>
+                        {{ baseline_metrics.accuracy }}%
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>
+                        Precision
+                    </td>
+
+                    <td>
+                        {{ ml_metrics.precision }}%
+                    </td>
+
+                    <td>
+                        {{ baseline_metrics.precision }}%
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>
+                        Recall
+                    </td>
+
+                    <td>
+                        {{ ml_metrics.recall }}%
+                    </td>
+
+                    <td>
+                        {{ baseline_metrics.recall }}%
+                    </td>
+
+                </tr>
+
+
+                <tr>
+
+                    <td>
+                        Macro F1
+                    </td>
+
+                    <td>
+                        {{ ml_metrics.f1 }}%
+                    </td>
+
+                    <td>
+                        {{ baseline_metrics.f1 }}%
+                    </td>
+
+                </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- AGREEMENT -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>
+            Prediction Agreement
+        </h2>
+
+        <div class="agreement-box">
+
+            {{ agreement_percentage }}%
+
+        </div>
+
+        <p class="description">
+
+            Percentage of test tickets for which the
+            machine learning model and heuristic baseline
+            produced the same prediction.
+
+        </p>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- MODEL COMPARISON -->
+    <!-- ================================================= -->
+
+    {% if model_comparison %}
+
+    <div class="card">
+
+        <h2>
+            Machine Learning Model Comparison
+        </h2>
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    {% for key in model_comparison[0].keys() %}
+
+                    <th>
+                        {{ key }}
+                    </th>
+
+                    {% endfor %}
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for row in model_comparison %}
+
+                <tr>
+
+                    {% for value in row.values() %}
+
+                    <td>
+
+                        {% if value is number %}
+
+                            {{ "%.4f"|format(value) }}
+
+                        {% else %}
+
+                            {{ value }}
+
+                        {% endif %}
+
+                    </td>
+
+                    {% endfor %}
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- ================================================= -->
+    <!-- ML CONFUSION MATRIX -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>
+            Machine Learning Confusion Matrix
+        </h2>
+
+        <p class="description">
+
+            Rows represent actual queues and columns represent
+            queues predicted by the machine learning model.
+
+        </p>
+
+
+        <div class="matrix-container">
+
+            <table class="matrix">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Actual \ Predicted
+                        </th>
+
+                        {% for label in labels %}
+
+                        <th>
+                            {{ label }}
+                        </th>
+
+                        {% endfor %}
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for i in range(labels|length) %}
+
+                    <tr>
+
+                        <th>
+                            {{ labels[i] }}
+                        </th>
+
+                        {% for j in range(labels|length) %}
+
+                        <td>
+
+                            {{ ml_matrix[i][j] }}
+
+                        </td>
+
+                        {% endfor %}
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- ================================================= -->
+    <!-- BASELINE CONFUSION MATRIX -->
+    <!-- ================================================= -->
+
+    <div class="card">
+
+        <h2>
+            Heuristic Baseline Confusion Matrix
+        </h2>
+
+        <p class="description">
+
+            Rows represent actual queues and columns represent
+            queues predicted by the heuristic baseline.
+
+        </p>
+
+
+        <div class="matrix-container">
+
+            <table class="matrix">
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Actual \ Predicted
+                        </th>
+
+                        {% for label in labels %}
+
+                        <th>
+                            {{ label }}
+                        </th>
+
+                        {% endfor %}
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for i in range(labels|length) %}
+
+                    <tr>
+
+                        <th>
+                            {{ labels[i] }}
+                        </th>
+
+                        {% for j in range(labels|length) %}
+
+                        <td>
+
+                            {{ baseline_matrix[i][j] }}
+
+                        </td>
+
+                        {% endfor %}
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    {% endif %}
+
+</div>
+
+</body>
+
+</html>

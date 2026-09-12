@@ -1,0 +1,15 @@
+parameter,value
+model,LinearSVC + CalibratedClassifierCV
+C,3
+class_weight,balanced
+calibration_method,sigmoid
+calibration_cv,5
+word_features,30000
+character_features,30000
+total_features,60000
+training_samples,25600
+testing_samples,6400
+accuracy,0.84359375
+precision_weighted,0.8487806201132595
+recall_weighted,0.84359375
+f1_macro,0.8737511959161666
